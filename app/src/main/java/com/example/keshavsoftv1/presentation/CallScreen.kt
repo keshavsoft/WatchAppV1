@@ -1,76 +1,110 @@
-package com.example.keshavsoftv1.presentation   // adjust if needed
+package com.example.keshavsoftv1.presentation
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonDefaults
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipDefaults
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.*
+
+import androidx.compose.ui.res.stringResource
+import com.example.keshavsoftv1.R
 
 @Composable
 fun CallScreen(onClose: () -> Unit) {
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+
+    val phoneNumber = stringResource(id = R.string.call_number)
+
+    var pressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 1.12f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "callButtonScale"
+    )
+
+    LaunchedEffect(pressed) {
+        if (pressed) {
+            kotlinx.coroutines.delay(160)
+            pressed = false
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp)
     ) {
-        // ---- Call button block, slightly ABOVE center ----
+
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .offset(y = (-12).dp),      // move UP a bit
+                .offset(y = (-14).dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
                 onClick = {
-                    val intent = Intent(
-                        Intent.ACTION_DIAL,
-                        Uri.parse("tel:9848163021")
-                    )
-                    context.startActivity(intent)
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    pressed = true
+                    context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber")))
                 },
-                modifier = Modifier.size(92.dp),
+                modifier = Modifier
+                    .size(88.dp)
+                    .graphicsLayer(scaleX = scale, scaleY = scale),
                 shape = CircleShape,
-                colors = ButtonDefaults.primaryButtonColors()
-            ) {
-                Text(
-                    text = "📞",
-                    fontSize = 30.sp,
-                    textAlign = TextAlign.Center
+                colors = ButtonDefaults.primaryButtonColors(
+                    backgroundColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
                 )
+            ) {
+                Text(text = "📞", fontSize = 28.sp)
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Call 9848163021",
-                fontSize = 13.sp,
+                text = "Call $phoneNumber",
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center
             )
         }
 
-        // ---- Bottom Close button, narrower width ----
+        // ---- Bottom Close ----
         Chip(
-            onClick = onClose,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClose()
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .width(140.dp)            // not full width
-                .padding(bottom = 12.dp),
-            label = { Text("Close", fontSize = 13.sp) },
+                .width(120.dp)          // smaller width
+                .padding(bottom = 18.dp), // more spacing from number
+            label = { Text("Close", fontSize = 11.sp) },
             icon = { Text("❌") },
-            colors = ChipDefaults.secondaryChipColors()
+            shape = RoundedCornerShape(50),
+            colors = ChipDefaults.secondaryChipColors(
+                backgroundColor = Color(0xFFB00020),
+                contentColor = Color.White
+            )
         )
     }
 }
