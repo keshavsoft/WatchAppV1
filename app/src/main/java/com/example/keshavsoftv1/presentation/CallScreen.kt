@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.*
 import com.example.keshavsoftv1.R
 
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+
 // ---------- PAGE 0 : Call Screen ----------
 
 @Composable
@@ -139,7 +142,7 @@ fun MainPager(onClose: () -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Pages
+        // ----- PAGES -----
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
@@ -150,6 +153,29 @@ fun MainPager(onClose: () -> Unit) {
             }
         }
 
-        // (dots code or no dots — doesn’t matter for now)
+        // ----- TOP DOTS INDICATOR -----
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(pagerState.pageCount) { index ->
+                val selected = pagerState.currentPage == index
+
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .size(if (selected) 6.dp else 4.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (selected)
+                                Color.White.copy(alpha = 0.9f)
+                            else
+                                Color.LightGray.copy(alpha = 0.6f)
+                        )
+                )
+            }
+        }
     }
 }
