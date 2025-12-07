@@ -5,7 +5,10 @@ import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
@@ -21,9 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.*
-
-import androidx.compose.ui.res.stringResource
 import com.example.keshavsoftv1.R
+
+// ---------- PAGE 0 : Call Screen ----------
 
 @Composable
 fun CallScreen(onClose: () -> Unit) {
@@ -54,7 +57,6 @@ fun CallScreen(onClose: () -> Unit) {
             .fillMaxSize()
             .padding(horizontal = 8.dp)
     ) {
-
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -65,7 +67,9 @@ fun CallScreen(onClose: () -> Unit) {
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     pressed = true
-                    context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber")))
+                    context.startActivity(
+                        Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
+                    )
                 },
                 modifier = Modifier
                     .size(88.dp)
@@ -88,7 +92,6 @@ fun CallScreen(onClose: () -> Unit) {
             )
         }
 
-        // ---- Bottom Close ----
         Chip(
             onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -96,8 +99,8 @@ fun CallScreen(onClose: () -> Unit) {
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .width(120.dp)          // smaller width
-                .padding(bottom = 18.dp), // more spacing from number
+                .width(120.dp)
+                .padding(bottom = 18.dp),
             label = { Text("Close", fontSize = 11.sp) },
             icon = { Text("❌") },
             shape = RoundedCornerShape(50),
@@ -106,5 +109,36 @@ fun CallScreen(onClose: () -> Unit) {
                 contentColor = Color.White
             )
         )
+    }
+}
+
+// ---------- PAGE 1 : Greetings Screen ----------
+
+@Composable
+fun InfoScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Greetings from", fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "KeshavSoft V1", fontSize = 16.sp)
+        }
+    }
+}
+
+// ---------- PAGER : Swipe between screens ----------
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MainPager(onClose: () -> Unit) {
+    val pagerState = rememberPagerState(pageCount = { 2 })
+
+    HorizontalPager(state = pagerState) { page ->
+        when (page) {
+            0 -> CallScreen(onClose = onClose)  // first page
+            1 -> InfoScreen()                   // second page (swipe from right)
+        }
     }
 }

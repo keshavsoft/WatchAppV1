@@ -35,10 +35,9 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            CallScreen(
-                onClose = { finish() }
-            )
+            MainPager(onClose = { finish() })
         }
+
 
     }
 }
