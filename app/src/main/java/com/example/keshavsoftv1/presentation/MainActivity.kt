@@ -35,8 +35,11 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            WearApp("Android")
+            CallScreen(
+                onClose = { finish() }
+            )
         }
+
     }
 }
 
