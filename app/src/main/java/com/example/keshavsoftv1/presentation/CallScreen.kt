@@ -29,7 +29,10 @@ import com.example.keshavsoftv1.R
 // ---------- PAGE 0 : Call Screen ----------
 
 @Composable
-fun CallScreen(onClose: () -> Unit) {
+fun CallScreen(
+    onClose: () -> Unit,
+    showSwipeHint: Boolean = false
+) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
 
@@ -129,16 +132,24 @@ fun InfoScreen() {
 }
 
 // ---------- PAGER : Swipe between screens ----------
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainPager(onClose: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { 2 })
 
-    HorizontalPager(state = pagerState) { page ->
-        when (page) {
-            0 -> CallScreen(onClose = onClose)  // first page
-            1 -> InfoScreen()                   // second page (swipe from right)
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // Pages
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            when (page) {
+                0 -> CallScreen(onClose = onClose, showSwipeHint = true)
+                1 -> InfoScreen()
+            }
         }
+
+        // (dots code or no dots — doesn’t matter for now)
     }
 }
